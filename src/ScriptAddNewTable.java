@@ -6,6 +6,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 
 import java.io.*;
@@ -105,7 +106,8 @@ public class ScriptAddNewTable implements IJDomScript {
 			}
 
 			if (null != documentList) {
-				outerloop: for (int index = 0; index < documentList.size(); index++) {
+				outerloop:
+				for (int index = 0; index < documentList.size(); index++) {
 					Element documentNode = (Element) documentList.get(index);
 					selectedDocumentNode = documentNode;
 					if (null == documentNode) {
@@ -390,19 +392,17 @@ public class ScriptAddNewTable implements IJDomScript {
 		return data;
 	}
 
-	// public static void main(String args[]) {
-	// System.out.println("entering....");
-	// String filePath = "D:\\BI4_batch.xml";
-	// try {
-	// SAXBuilder sb = new SAXBuilder();
-	// Document doc = sb.build(filePath);
-	// // new XMLOutputter(Format.getPrettyFormat()).output(doc, System.out);
-	// ScriptAddNewTableJDOM functionScript = new ScriptAddNewTableJDOM();
-	// functionScript.execute(doc, "", "DOC1");
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// }
-	//
-	// }
-
+/*	public static void main(String args[]) {
+		System.out.println("entering....");
+		String filePath = "D:\\BI4_batch.xml";
+		try {
+			SAXBuilder sb = new SAXBuilder();
+			Document doc = sb.build(filePath);
+			// new XMLOutputter(Format.getPrettyFormat()).output(doc, System.out);
+			ScriptAddNewTableJDOM functionScript = new ScriptAddNewTableJDOM();
+			functionScript.execute(doc, "", "DOC1");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}*/
 }
