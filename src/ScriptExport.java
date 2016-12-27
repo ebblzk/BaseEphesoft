@@ -1,18 +1,12 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
+import com.ephesoft.dcma.script.IJDomScript;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 
-import com.ephesoft.dcma.script.IJDomScript;
+import java.io.*;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class ScriptExport implements IJDomScript {
 
@@ -21,8 +15,18 @@ public class ScriptExport implements IJDomScript {
 	private static final String EXT_BATCH_XML_FILE = "_batch.xml";
 	private static String ZIP_FILE_EXT = ".zip";
 
+	public static OutputStream getOutputStreamFromZip(final String zipName, final String fileName) throws FileNotFoundException,
+			IOException {
+		ZipOutputStream stream = null;
+		stream = new ZipOutputStream(new FileOutputStream(new File(zipName + ZIP_FILE_EXT)));
+		ZipEntry zipEntry = new ZipEntry(fileName);
+		stream.putNextEntry(zipEntry);
+		return stream;
+	}
+
 	public Object execute(Document document, String methodName, String docIdentifier) {
 		Exception exception = null;
+		//Forcing crash.
 		int wTF = 1/0;
 		try {
 			System.out.println("*************  Inside ExportScript scripts.");
@@ -43,7 +47,7 @@ public class ScriptExport implements IJDomScript {
 
 	/**
 	 * The <code>writeToXML</code> method will write the state document to the XML file.
-	 * 
+	 *
 	 * @param document {@link Document}.
 	 */
 	private void writeToXML(Document document) {
@@ -102,14 +106,5 @@ public class ScriptExport implements IJDomScript {
 				}
 			}
 		}
-	}
-
-	public static OutputStream getOutputStreamFromZip(final String zipName, final String fileName) throws FileNotFoundException,
-			IOException {
-		ZipOutputStream stream = null;
-		stream = new ZipOutputStream(new FileOutputStream(new File(zipName + ZIP_FILE_EXT)));
-		ZipEntry zipEntry = new ZipEntry(fileName);
-		stream.putNextEntry(zipEntry);
-		return stream;
 	}
 }
