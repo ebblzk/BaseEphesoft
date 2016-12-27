@@ -1,10 +1,14 @@
+import com.ephesoft.dcma.core.DCMAException;
+import com.ephesoft.dcma.core.hibernate.DynamicHibernateDao;
+import com.ephesoft.dcma.core.hibernate.DynamicHibernateDao.ColumnDefinition;
+import com.ephesoft.dcma.script.IJDomScript;
+import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,22 +16,11 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
-
-import com.ephesoft.dcma.core.hibernate.DynamicHibernateDao;
-import com.ephesoft.dcma.core.hibernate.DynamicHibernateDao.ColumnDefinition;
-import com.ephesoft.dcma.script.IJDomScript;
-
 /**
  * The <code>ScriptAddNewTable</code> class represents the script execute structure. Writer of scripts plug-in should implement this
  * IScript interface to execute it from the scripting plug-in. Via implementing this interface writer can change its java file at run
  * time. Before the actual call of the java Scripting plug-in will compile the java and run the new class file.
- * 
+ *
  * @author Ephesoft
  * @version 1.0
  */
@@ -60,18 +53,27 @@ public class ScriptAddNewTable implements IJDomScript {
 	private static String VALID = "Valid";
 	private static String ALL = "*";
 	private static String TABLE = "test_table";
-	private String COLUMN = "Column";
 	private static String BATCH_LOCAL_PATH = "BatchLocalPath";
 	private static String BATCH_INSTANCE_ID = "BatchInstanceIdentifier";
 	private static String EXT_BATCH_XML_FILE = "_batch.xml";
 	private static String ZIP_FILE_EXT = ".zip";
 	private static String IS_RULE_VALID = "isRuleValid";
 	private static String TRUE = "true";
+	private String COLUMN = "Column";
+
+	public static OutputStream getOutputStreamFromZip(final String zipName, final String fileName) throws FileNotFoundException,
+			IOException {
+		ZipOutputStream stream = null;
+		stream = new ZipOutputStream(new FileOutputStream(new File(zipName + ZIP_FILE_EXT)));
+		ZipEntry zipEntry = new ZipEntry(fileName);
+		stream.putNextEntry(zipEntry);
+		return stream;
+	}
 
 	/**
 	 * The <code>execute</code> method will execute the script written by the writer at run time with new compilation of java file. It
 	 * will execute the java file dynamically after new compilation.
-	 * 
+	 *
 	 * @param document {@link Document}
 	 */
 	@Override
@@ -164,7 +166,7 @@ public class ScriptAddNewTable implements IJDomScript {
 				populateDataTable(dataTablesNode, columnNames, data);
 
 				// Write the document object to the xml file. Currently following IF block is commented for performance improvement.
-				/*if (isWrite) {					
+				/*if (isWrite) {
 					writeToXML(document);
 					System.out.println("*************  Successfully write the xml file for the ScriptAddNewTable scripts.");
 				}*/
@@ -277,7 +279,7 @@ public class ScriptAddNewTable implements IJDomScript {
 
 	/**
 	 * The <code>search</code> method will search for a node among child of passed given node.
-	 * 
+	 *
 	 * @param parentNode
 	 * @param nodeNameToBeSearched
 	 */
@@ -303,7 +305,7 @@ public class ScriptAddNewTable implements IJDomScript {
 
 	/**
 	 * The <code>writeToXML</code> method will write the state document to the XML file.
-	 * 
+	 *
 	 * @param document {@link Document}.
 	 */
 	private void writeToXML(Document document) {
@@ -363,7 +365,7 @@ public class ScriptAddNewTable implements IJDomScript {
 		}
 	}
 
-	private List<ColumnDefinition> getColumnNames() throws SQLException {
+	private List<ColumnDefinition> getColumnNames() throws SQLException, DCMAException {
 		List<ColumnDefinition> columnList = null;
 		try {
 			DynamicHibernateDao dynamicHibernateDao = new DynamicHibernateDao(dbUserName, dbPassword, dbDriver, dbConnectionURL);
@@ -374,7 +376,7 @@ public class ScriptAddNewTable implements IJDomScript {
 		return columnList;
 	}
 
-	private List<Object[]> getTableData() throws SQLException {
+	private List<Object[]> getTableData() throws SQLException, DCMAException {
 		List<Object[]> data = new ArrayList<Object[]>();
 		try {
 			DynamicHibernateDao dynamicHibernateDao = new DynamicHibernateDao(dbUserName, dbPassword, dbDriver, dbConnectionURL);
@@ -386,15 +388,6 @@ public class ScriptAddNewTable implements IJDomScript {
 			System.err.println(e.getMessage());
 		}
 		return data;
-	}
-
-	public static OutputStream getOutputStreamFromZip(final String zipName, final String fileName) throws FileNotFoundException,
-			IOException {
-		ZipOutputStream stream = null;
-		stream = new ZipOutputStream(new FileOutputStream(new File(zipName + ZIP_FILE_EXT)));
-		ZipEntry zipEntry = new ZipEntry(fileName);
-		stream.putNextEntry(zipEntry);
-		return stream;
 	}
 
 	// public static void main(String args[]) {
